@@ -33,7 +33,7 @@ async function handleRequest(request) {
   let requestBody = await request.text();
 
   if (TURN_OFF_PINGING) {
-    requestBody = requestBody.replace(/@/g, '@!');
+    requestBody = requestBody.replace(/@/g, 'AT');
   } 
 
   const url = new URL(request.url)
