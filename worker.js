@@ -6,6 +6,9 @@ const webhookIDs = {
 
 // Make your friends less annoying for free!
 const TURN_OFF_PINGING = false;
+const TURN_OFF_EVERYONE_HERE_PINGING = true;
+const CUSTOM_WORDS_BLOCKLIST = "TEST-ONE, TEST-TWO";
+const OWOIFY = false;
 
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
@@ -15,7 +18,6 @@ addEventListener('fetch', event => {
 const allowedMethods = ['POST', 'PUT', 'PATCH']
 
 async function handleRequest(request) {
-  // Handle preflight requests
   if (request.method === 'OPTIONS') {
     return new Response(null, {
       headers: {
@@ -35,6 +37,23 @@ async function handleRequest(request) {
   if (TURN_OFF_PINGING) {
     requestBody = requestBody.replace(/@/g, 'AT');
   } 
+
+  if (TURN_OFF_EVERYONE_HERE_PINGING) {
+    requestBody = requestBody.replace(/\b(everyone)\b/gi, 'noone');
+    requestBody = requestBody.replace(/\b(here)\b/gi, 'where');
+  }
+
+  if (CUSTOM_WORDS_BLOCKLIST) {
+    const blockList = CUSTOM_WORDS_BLOCKLIST.split(',').map(word => word.trim());
+    blockList.forEach(blockedWord => {
+      const regex = new RegExp(`\\b(${blockedWord})\\b`, 'gi');
+      requestBody = requestBody.replace(regex, '[BLOCKEDWORD]');
+    });
+  }
+
+  if (OWOIFY) {
+    requestBody = requestBody.replace(/[rl]/gi, 'w');
+  }
 
   const url = new URL(request.url)
   const path = url.pathname.substring(1)
